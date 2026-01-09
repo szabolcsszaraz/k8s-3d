@@ -2,85 +2,54 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kubernetes – 3D infrastruktúra</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>K8s 3D – Debug</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0b0e14;
-      color: #e6e6e6;
-    }
-    header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #1f2330;
-      background: #0f1320;
-    }
-    h1 {
-      margin: 0 0 6px 0;
-      font-size: 18px;
-      font-weight: 600;
-    }
-    .sub {
-      font-size: 13px;
-      opacity: 0.8;
-    }
-    main {
-      padding: 14px;
-    }
-    model-viewer {
-      width: 100%;
-      height: 72vh;
-      background: radial-gradient(circle at top, #2a2f3a, #0b0e14);
-      border-radius: 16px;
-    }
-    footer {
-      padding: 14px 20px;
-      font-size: 12px;
-      opacity: 0.75;
-      border-top: 1px solid #1f2330;
-    }
-    code {
-      background: #1f2330;
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
+    body{margin:0;font-family:system-ui;background:#0b0e14;color:#e6e6e6}
+    header{padding:16px 20px;border-bottom:1px solid #1f2330;background:#0f1320}
+    main{padding:14px}
+    model-viewer{width:100%;height:70vh;background:#111827;border-radius:14px}
+    #log{margin-top:10px;padding:10px 12px;border:1px solid #1f2330;border-radius:12px;background:#0f1320;font-size:13px;white-space:pre-wrap}
+    code{background:#1f2330;padding:2px 6px;border-radius:6px}
   </style>
 </head>
-
 <body>
-  <header>
-    <h1>Kubernetes – 3D infrastruktúra</h1>
-    <div class="sub">Forgasd a modellt • Telefonon AR gomb is megjelenhet</div>
-  </header>
+<header>
+  <b>Debug</b> – <code>model.glb</code> betöltés teszt
+</header>
+<main>
+  <model-viewer id="mv" src="./model.glb" camera-controls auto-rotate environment-image="neutral"></model-viewer>
+  <div id="log">Indul…</div>
+</main>
 
-  <main>
-    <model-viewer
-      src="model.glb"
-      ar
-      ar-modes="scene-viewer webxr quick-look"
-      camera-controls
-      auto-rotate
-      environment-image="neutral"
-      skybox-image="neutral"
-      exposure="1.2"
-      shadow-intensity="1"
-      tone-mapping="commerce"
-      alt="Kubernetes infrastruktúra 3D modell">
-    </model-viewer>
+<script type="module">
+  const log = (t) => document.getElementById('log').textContent += "\n" + t;
+  const url = new URL('./model.glb', location.href).toString();
+  log("model URL: " + url);
 
-    <p style="margin-top:10px;font-size:13px;opacity:.8;text-align:center">
-      Kubernetes node-ok • storage • hálózat
-    </p>
-  </main>
+  try{
+    const r = await fetch(url, { method: "GET" });
+    log("fetch status: " + r.status);
+    log("content-type: " + (r.headers.get("content-type") || ""));
+    log("content-length: " + (r.headers.get("content-length") || ""));
+    const buf = await r.arrayBuffer();
+    log("bytes downloaded: " + buf.byteLength);
 
-  <footer>
-    Modell licenc: <code>CC BY</code><br />
-    Attribution: ide írd be a modell nevét + alkotóját (ha kell)
-  </footer>
+    const first = new TextDecoder().decode(buf.slice(0, 120));
+    if (first.includes("git-lfs.github.com/spec")) {
+      log("HIBA: LFS POINTERT kaptam, nem valódi GLB-t!");
+      log("első 120 bájt:\n" + first);
+    } else {
+      log("OK: nem pointernek tűnik (valószínű bináris GLB).");
+    }
+  } catch(e){
+    log("FETCH HIBA: " + e);
+  }
+
+  const mv = document.getElementById('mv');
+  mv.addEventListener('load', () => log("model-viewer: LOAD OK"));
+  mv.addEventListener('error', () => log("model-viewer: ERROR (nem tudta betölteni)"));
+</script>
 </body>
 </html>
