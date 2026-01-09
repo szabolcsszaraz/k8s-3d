@@ -1,92 +1,86 @@
 <!doctype html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kubernetes – 3D nézet</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kubernetes – 3D infrastruktúra</title>
+
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
   <style>
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#0b0e14;color:#e6e6e6}
-    header{padding:16px 20px;border-bottom:1px solid #1f2330;background:#0f1320}
-    h1{margin:0 0 6px 0;font-size:18px;font-weight:600}
-    .sub{font-size:13px;opacity:.8}
-    main{padding:14px}
-    model-viewer{width:100%;height:72vh;background:radial-gradient(circle at top,#2a2f3a,#0b0e14);border-radius:16px}
-    #status{margin-top:10px;padding:10px 12px;border:1px solid #1f2330;border-radius:12px;background:#0f1320;font-size:13px;opacity:.9}
-    code{background:#1f2330;padding:2px 6px;border-radius:6px}
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0e14;
+      color: #e6e6e6;
+    }
+    header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #1f2330;
+      background: #0f1320;
+    }
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .sub {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+    main {
+      padding: 14px;
+    }
+    model-viewer {
+      width: 100%;
+      height: 72vh;
+      background: radial-gradient(circle at top, #2a2f3a, #0b0e14);
+      border-radius: 16px;
+    }
+    footer {
+      padding: 14px 20px;
+      font-size: 12px;
+      opacity: 0.75;
+      border-top: 1px solid #1f2330;
+    }
+    code {
+      background: #1f2330;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <h1>Kubernetes – 3D infrastruktúra</h1>
-  <div class="sub">Ha üres: a <code>model.glb</code> valószínű nem töltődik be.</div>
-</header>
+  <header>
+    <h1>Kubernetes – 3D infrastruktúra</h1>
+    <div class="sub">Forgasd a modellt • Telefonon AR gomb is megjelenhet</div>
+  </header>
 
-<main>
-  <model-viewer
-    id="viewer"
-    src="model.glb"
-    camera-controls
-    auto-rotate
-    environment-image="neutral"
-    exposure="1.4"
-    shadow-intensity="1"
-    alt="3D modell">
-  </model-viewer>
+  <main>
+    <model-viewer
+      src="model.glb"
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      camera-controls
+      auto-rotate
+      environment-image="neutral"
+      skybox-image="neutral"
+      exposure="1.2"
+      shadow-intensity="1"
+      tone-mapping="commerce"
+      alt="Kubernetes infrastruktúra 3D modell">
+    </model-viewer>
 
-  <div id="status">Állapot: betöltés…</div>
-</main>
+    <p style="margin-top:10px;font-size:13px;opacity:.8;text-align:center">
+      Kubernetes node-ok • storage • hálózat
+    </p>
+  </main>
 
-<script type="module">
-  const statusEl = document.getElementById('status');
-  const viewer = document.getElementById('viewer');
-
-  const modelUrl = new URL('model.glb', window.location.href).toString();
-
-  async function checkFile() {
-    try {
-      const r = await fetch(modelUrl, { method: 'HEAD' });
-      if (!r.ok) {
-        statusEl.textContent = `HIBA: model.glb nem érhető el (${r.status}). Ellenőrizd: fájlnév pontosan "model.glb" és a repo gyökerében legyen. URL: ${modelUrl}`;
-        return false;
-      }
-      statusEl.textContent = `OK: model.glb elérhető (${r.status}). URL: ${modelUrl}`;
-      return true;
-    } catch (e) {
-      statusEl.textContent = `HIBA: nem tudtam elérni a model.glb-t. URL: ${modelUrl}`;
-      return false;
-    }
-  }
-
-  viewer.addEventListener('error', (ev) => {
-    statusEl.textContent = `MODEL-VIEWER HIBA: a modell betöltése nem sikerült. Valószínű 404/rossz útvonal. model.glb URL: ${modelUrl}`;
-  });
-
-  viewer.addEventListener('load', () => {
-    statusEl.textContent = `OK: modell betöltve.`;
-    // Spline free export esetén anyag reset (ha kell)
-    const model = viewer.model;
-    if (model) {
-      model.materials.forEach(mat => {
-        try {
-          mat.setAlphaMode('OPAQUE');
-          mat.setDoubleSided(true);
-          const pbr = mat.pbrMetallicRoughness;
-          pbr.setBaseColorFactor([0.85, 0.88, 0.92, 1]);
-          pbr.setMetallicFactor(0.05);
-          pbr.setRoughnessFactor(0.35);
-          pbr.setBaseColorTexture(null);
-          pbr.setMetallicRoughnessTexture(null);
-          mat.setNormalTexture(null);
-          mat.setOcclusionTexture(null);
-          mat.setEmissiveTexture(null);
-        } catch {}
-      });
-    }
-  });
-
-  checkFile();
-</script>
+  <footer>
+    Modell licenc: <code>CC BY</code><br />
+    Attribution: ide írd be a modell nevét + alkotóját (ha kell)
+  </footer>
 </body>
 </html>
