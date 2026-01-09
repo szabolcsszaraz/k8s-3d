@@ -2,51 +2,118 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kubernetes Cluster – 3D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kubernetes – 3D nézet</title>
+
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
   <style>
-    body{margin:0;font-family:system-ui,Arial}
-    header{padding:14px 16px;border-bottom:1px solid #ddd}
-    h1{font-size:18px;margin:0 0 6px 0}
-    .sub{font-size:13px;opacity:.8}
-    .wrap{padding:12px 16px}
-    model-viewer{
-    width:100%;
-    height:70vh;
-    background: radial-gradient(circle at top, #2b2f3a, #0f1117);
-    border-radius: 16px;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0e14;
+      color: #e6e6e6;
     }
-    footer{padding:14px 16px;font-size:12px;opacity:.75}
-    code{background:#eee;padding:2px 6px;border-radius:8px}
+
+    header {
+      padding: 16px 18px;
+      border-bottom: 1px solid #1f2330;
+      background: #0f1320;
+    }
+
+    h1 {
+      margin: 0 0 4px 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .sub {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    main {
+      padding: 14px;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 72vh;
+      background: radial-gradient(circle at top, #2a2f3a, #0b0e14);
+      border-radius: 16px;
+    }
+
+    footer {
+      padding: 14px 18px;
+      font-size: 12px;
+      opacity: 0.75;
+      border-top: 1px solid #1f2330;
+    }
+
+    code {
+      background: #1f2330;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>Kubernetes – 3D nézet</h1>
-    <div class="sub">Telefonon próbáld meg az AR gombot (ha megjelenik).</div>
+    <h1>Kubernetes – 3D infrastruktúra</h1>
+    <div class="sub">Forgasd a modellt • Telefonon AR gomb is megjelenhet</div>
   </header>
 
-  <div class="wrap">
+  <main>
     <model-viewer
+      id="viewer"
       src="model.glb"
       ar
       ar-modes="scene-viewer webxr quick-look"
       camera-controls
       auto-rotate
-      exposure="1.4"
-      shadow-intensity="1"
+      rotation-per-second="18deg"
       environment-image="neutral"
-      skybox-image="neutral">
+      skybox-image="neutral"
+      exposure="1.6"
+      shadow-intensity="1"
+      tone-mapping="commerce"
+      camera-orbit="45deg 65deg 2.5m"
+      field-of-view="35deg"
+      alt="Kubernetes cluster 3D modell">
     </model-viewer>
 
-    <p style="margin-top:12px;font-size:13px;opacity:.85;">
-      Modell licenc: <code>CC BY</code> – forrásmegjelölés lent.
+    <p style="margin-top:10px;font-size:13px;opacity:.8;text-align:center">
+      Kubernetes node-ok, storage és hálózati kapcsolatok
     </p>
-  </div>
+  </main>
 
   <footer>
-    Attribution: IDE ÍRD BE majd a választott Sketchfab modell nevét + alkotóját (CC BY).
+    Modell licenc: <code>CC BY</code> • Forrásmegjelölés lent
+    <br />
+    Attribution: IDE ÍRD BE a Sketchfab modell nevét + alkotóját
   </footer>
+
+  <!-- ÁTTETSZŐ ANYAGOK JAVÍTÁSA -->
+  <script type="module">
+    const viewer = document.getElementById('viewer');
+
+    viewer.addEventListener('load', () => {
+      const model = viewer.model;
+      if (!model) return;
+
+      model.materials.forEach(mat => {
+        if (mat.setAlphaMode) mat.setAlphaMode('OPAQUE');
+        if (mat.setDoubleSided) mat.setDoubleSided(true);
+
+        const pbr = mat.pbrMetallicRoughness;
+        if (pbr && pbr.getBaseColorFactor && pbr.setBaseColorFactor) {
+          const c = pbr.getBaseColorFactor();
+          pbr.setBaseColorFactor([c[0], c[1], c[2], 1]);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
