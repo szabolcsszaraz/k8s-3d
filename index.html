@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kubernetes Cluster – 3D</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body{margin:0;font-family:system-ui,Arial}
+    header{padding:14px 16px;border-bottom:1px solid #ddd}
+    h1{font-size:18px;margin:0 0 6px 0}
+    .sub{font-size:13px;opacity:.8}
+    .wrap{padding:12px 16px}
+    model-viewer{width:100%;height:70vh;background:#f6f6f6;border-radius:14px}
+    footer{padding:14px 16px;font-size:12px;opacity:.75}
+    code{background:#eee;padding:2px 6px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kubernetes – 3D nézet</h1>
+    <div class="sub">Telefonon próbáld meg az AR gombot (ha megjelenik).</div>
+  </header>
+
+  <div class="wrap">
+    <model-viewer
+      src="model.glb"
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      camera-controls
+      auto-rotate
+      alt="Kubernetes infrastruktúra 3D modell">
+    </model-viewer>
+
+    <p style="margin-top:12px;font-size:13px;opacity:.85;">
+      Modell licenc: <code>CC BY</code> – forrásmegjelölés lent.
+    </p>
+  </div>
+
+  <footer>
+    Attribution: IDE ÍRD BE majd a választott Sketchfab modell nevét + alkotóját (CC BY).
+  </footer>
+</body>
+</html>
